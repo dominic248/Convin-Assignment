@@ -29,7 +29,7 @@ pip install -r requirements.txt
 cd src
 python manage.py runserver
 ```
-### Default:
+#### Default:
 ```
 Username: dms
 Password: 24081999
@@ -42,48 +42,53 @@ python manage.py runserver
 ```
 ***
 ## URL's in Project
-### Admin URL:
-```admin/```
-### Create API URL for assignment-1 (Registration Form):
+#### Admin URL: ```admin/```
+#### Create API URL for assignment-1 (Registration Form): ```api/register/create/```
+#### Update API URL for assignment-1 with API and email notifications (Registration Form): ```api/register/rud/<pk>/```
+#### Create API URL for assignment-2 (File hashing Form): ```api/file/create/```
+#### Update API URL for assignment-1 with API and email notifications (File hashing Form): ```api/file/rud/<pk>/```
+*** 
 
-```api/register/create/```
-### Update API URL for assignment-1 with API and email notifications (Registration Form):
-```api/register/rud/<pk>/```
-### Create API URL for assignment-2 (File hashing Form):
-```api/file/create/```
-### Update API URL for assignment-1 with API and email notifications (File hashing Form):
-```api/file/rud/<pk>/```
-***
+## Examples via curl
+#### Q.1) Create a model having fields of type CharField and FileField. Implement a system on top of this model which should notify the updated/created field only and its old and new value. (it shouldn’t notify about the field which is not updated). It should also notify in case content of FileField is changed. [You may use signals or any other mechanism of your choice.]   
 
-### Examples via curl
+### Create/add data via API for assignment-1:
 ```
 curl dms.com:8000/api/register/create/ -X POST -i --form name=Dominic -F email=dms24081999@gmail.com -F photo=@E:\Projects\Python\Django\Convin\src\test\1.jpg
 ```
-
 ```
 curl dms.com:8000/api/register/create/ -X POST -i --form name=Dominic2 -F email=dominicsilveira289@gmail.com -F photo=@E:\Projects\Python\Django\Convin\src\test\1.jpg -F cv=@E:\Projects\Python\Django\Convin\src\test\1.pdf
 ```
+![image alt text](docs/images/1.png)
 
+### Update data via API and receive notifications vai API and email for assignment-1:
 ```
 curl dms.com:8000/api/register/rud/109/ -X PUT -i --form name=Dominic2 -F email=dms24081999@gmail.com -F photo=@E:\Projects\Python\Django\Convin\src\test\1.jpg -F cv=@E:\Projects\Python\Django\Convin\src\test\2.pdf -F id=109
 ```
+![image alt text](docs/images/2.png)
 
 ```
 curl dms.com:8000/api/register/rud/110/ -X PUT -i --form name=Vincent -F email=dominicsilveira289@gmail.com -F blog_url=https://github.com/dms24081999 -F photo=@E:\Projects\Python\Django\Convin\src\test\1.jpg -F id=110
 ```
+![image alt text](docs/images/3.png)
 
+#### Q.2) Now suppose CharField is the encrypted value of the content of FileFIeld (or you can choose any heavy computation of your choice on the content of File(it may be just along for loop)). Implement a system which allows updating FileField content by an external party (for example invoking management command from bash or calling a Django API or your choice of making it accessible by an external party). Note: after FileField content is changed, it should notify the updated value of FileField and CharField. 
+### Create/add data via API for assignment-2:
 ```
 curl dms.com:8000/api/file/create/ -X POST -i -F email=dominicsilveira289@gmail.com -F document=@E:\Projects\Python\Django\Convin\src\test\1.jpg
 ```
-
 ```
 curl dms.com:8000/api/file/create/ -X POST -i -F email=dominicsilveira289@gmail.com -F document=@E:\Projects\Python\Django\Convin\src\test\2.pdf
 ```
+![image alt text](docs/images/4.png)
 
+### Update data via API and receive notifications vai API and email for assignment-1:
 ```
 curl dms.com:8000/api/file/rud/8/ -X PUT -i -F email=dominicsilveira289@gmail.com -F document=@E:\Projects\Python\Django\Convin\src\test\3.pdf
 ```
+![image alt text](docs/images/5.png)
 
 ```
 curl dms.com:8000/api/file/rud/9/ -X PUT -i -F email=dms24081999@gmail.com -F document=@E:\Projects\Python\Django\Convin\src\test\4.jpg
 ```
+![image alt text](docs/images/6.png)
