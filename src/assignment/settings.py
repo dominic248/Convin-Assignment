@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'phonenumber_field',
     'assignment1',
     'assignment2',
 ]
@@ -133,7 +134,8 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static-cdn-local')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
 
-
+AWS_CLIENT_ID = 'AKIATYY5R3CP5RSO3CUW'
+AWS_CLIENT_SECRET = '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'
 # EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # mail service smtp

@@ -6,6 +6,8 @@ from rest_framework import status
 from django.http import HttpResponse
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from assignment.functions import sendHTMLEmail,calc_sha256
+import boto3
+from django.conf import settings
 
 
 
@@ -48,6 +50,7 @@ class FileRUDView(RetrieveUpdateDestroyAPIView):
         instance.email = request.POST.get('email',None)
         instance.document = uploaded_file
         instance.document_hash = sha256
+        instance.phone = request.POST.get('phone',None)
         serializer = self.serializer_class(instance=instance,data=request.data,context={'request':request})
         if serializer.is_valid(raise_exception=False):
             instance.save()   
@@ -56,10 +59,14 @@ class FileRUDView(RetrieveUpdateDestroyAPIView):
             emails=[instance.email,]
             attachment=instance.document.path
             sendHTMLEmail(html_content,emails,subject,attachment)
-            return Response(serializer.data, status=status.HTTP_200_OK) 
+            client=boto3.client('sns','eu-west-1',aws_access_key_id = settings.AWS_CLIENT_ID,aws_secret_access_key = settings.AWS_CLIENT_SECRET)
+            url="https://" if request.is_secure() else "http://"+str(request.get_host()) + str(instance.document.url)
+            message=subject+"\nHash:"+str(instance.document_hash)+"\n Document: "+url
+            client.publish(PhoneNumber=str(instance.phone),Message=message)    
+            return Response(serializer.data, status=status.HTTP_200_OK)  
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    
+     
 
             

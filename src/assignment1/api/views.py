@@ -2,16 +2,18 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from ..models import RegisterModel
-from .serializers import RegisterModelSerializer
+from .serializers import RegisterModelCLSerializer,RegisterModelRUDSerializer
 from rest_framework import status 
 from django.http import HttpResponse
 from rest_framework import status
 from django.db import models
 from assignment.functions import sendHTMLEmail,calc_sha256
+import boto3
+from django.conf import settings
 
 class RegisterCLView(ListCreateAPIView):
     queryset = RegisterModel.objects.all()
-    serializer_class = RegisterModelSerializer
+    serializer_class = RegisterModelCLSerializer
 
     def list(self, request):
         queryset = self.get_queryset()
@@ -21,7 +23,7 @@ class RegisterCLView(ListCreateAPIView):
 
 class RegisterRUDView(RetrieveUpdateDestroyAPIView):
     parser_class = (FileUploadParser,)
-    serializer_class=RegisterModelSerializer
+    serializer_class=RegisterModelRUDSerializer
     queryset = RegisterModel.objects.all()
     lookup_field = 'pk'
 
@@ -44,10 +46,12 @@ class RegisterRUDView(RetrieveUpdateDestroyAPIView):
                     old_dict[f.name]="https://" if request.is_secure() else "http://"+str(request.get_host()) + str(getattr(instance, f.name, None).url)
                 else:
                     old_dict[f.name]=None
+                instance.__setattr__(f.name, request.FILES.get(f.name,None))
             elif RegisterModel._meta.get_field(f.name).__class__ is not models.FileField and getattr(instance, f.name, None)!=request.POST.get(f.name,None) and f.name!='id': 
                 old_dict[f.name]=getattr(instance, f.name, None)
-        instance.__dict__.update(data)
+                instance.__setattr__(f.name, request.POST.get(f.name,None)) 
         serializer = self.serializer_class(instance=instance,data=request.data,context={'request':request})
+        
         if serializer.is_valid(raise_exception=False):
             instance.save()   
             new_dict=dict(serializer.data)
@@ -66,6 +70,17 @@ class RegisterRUDView(RetrieveUpdateDestroyAPIView):
                 html_content=html_content+new
                 emails=[instance.email,]
                 sendHTMLEmail(html_content,emails,subject)
+                client=boto3.client('sns','eu-west-1',aws_access_key_id = settings.AWS_CLIENT_ID,aws_secret_access_key = settings.AWS_CLIENT_SECRET)
+                html_content = "\n\nOld data:\n"
+                old = [ str(key)+": "+str(val) for key, val in dictionary['old_data'].items() ]
+                old = "\n".join(old)
+                html_content=html_content+old+"\n\nNew data:\n"
+                new = [ str(key)+": "+str(val) for key, val in dictionary['new_data'].items() ]
+                new = "\n".join(new)
+                html_content=html_content+new
+                message=subject+html_content 
+                print(message)
+                client.publish(PhoneNumber=str(instance.phone),Message=message)    
             return Response(dictionary, status=status.HTTP_200_OK) 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

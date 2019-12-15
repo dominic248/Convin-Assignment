@@ -12,3 +12,8 @@ def validate_cv_extension(value):
     valid_extensions = ['.pdf', '.doc', '.docx']
     if not ext.lower() in valid_extensions:
         raise ValidationError(u'Unsupported file extension.')
+
+def validate_phone_extension(value):
+    if len(value)<12:
+        raise ValidationError('Invalid number!. Please provide national code too.')
+ 
