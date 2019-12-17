@@ -69,7 +69,7 @@ curl dms.com:8000/api/register/rud/132/ -X PUT -i --form name=Vincent -F email=d
 curl dms.com:8000/api/register/rud/133/ -X PUT -i --form name=Michael -F email=dominicsilveira289@gmail.com -F blog_url=https://github.com/dms24081999 -F photo=@E:\Projects\Python\Django\Convin\testcases\1.jpg -F phone=+919594183245
 ```
 ![image alt text](docs/images/3.png)
-![image alt text](docs/images/7.png)
+![image alt text](docs/images/9.png)
 
 #### Q.2) Now suppose CharField is the encrypted value of the content of FileFIeld (or you can choose any heavy computation of your choice on the content of File(it may be just along for loop)). Implement a system which allows updating FileField content by an external party (for example invoking management command from bash or calling a Django API or your choice of making it accessible by an external party). Note: after FileField content is changed, it should notify the updated value of FileField and CharField. 
 ### Create/add data via API for assignment-2:
@@ -91,4 +91,4 @@ curl dms.com:8000/api/file/rud/2/ -X PUT -i -F email=dominicsilveira289@gmail.co
 curl dms.com:8000/api/file/rud/3/ -X PUT -i -F email=dms24081999@gmail.com -F document=@E:\Projects\Python\Django\Convin\testcases\4.jpg -F phone=+919594183245
 ```
 ![image alt text](docs/images/6.png)
-![image alt text](docs/images/8.png)
+![image alt text](docs/images/10.png)
